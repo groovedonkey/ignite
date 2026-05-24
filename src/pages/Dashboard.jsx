@@ -56,7 +56,7 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
 }
 
 export default function Dashboard({ leads = [], loading = false, setPage, setSelectedLeadId }) {
-  const morningFive = leads.filter(l => l.temperature === 'hot').slice(0, 5)
+  const priorityContacts = [...leads].sort((a, b) => b.intentScore - a.intentScore).slice(0, 5)
   const alerts = leads.filter(l => l.isAlerted)
   const stats = {
     totalLeads: leads.length,
@@ -86,15 +86,15 @@ export default function Dashboard({ leads = [], loading = false, setPage, setSel
       </div>
 
       <div className="grid grid-cols-3 gap-6">
-        {/* Morning Five */}
+        {/* Priority Contacts */}
         <div className="col-span-2">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 <Flame size={18} className="text-orange-400" />
-                The Morning Five
+                Priority Contacts
               </h3>
-              <p className="text-sm text-gray-500 mt-0.5">Your top leads to call right now</p>
+              <p className="text-sm text-gray-500 mt-0.5">Your top 5 by intent score right now</p>
             </div>
             <button
               onClick={() => setPage('leads')}
@@ -105,7 +105,7 @@ export default function Dashboard({ leads = [], loading = false, setPage, setSel
           </div>
 
           <div className="space-y-3">
-            {morningFive.map((lead, index) => (
+            {priorityContacts.map((lead, index) => (
               <button
                 key={lead.id}
                 onClick={() => { setSelectedLeadId(lead.id); setPage('lead-detail') }}
