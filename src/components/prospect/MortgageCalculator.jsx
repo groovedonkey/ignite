@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Calculator, DollarSign, Percent, Calendar, TrendingUp } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Calculator, DollarSign, TrendingUp } from 'lucide-react'
 import { useSession } from '../../context/SessionContext'
 
 function formatCurrency(n) {
@@ -37,7 +37,21 @@ export default function MortgageCalculator({ onContactClick }) {
   const [downPaymentPct, setDownPaymentPct] = useState(20)
   const [interestRate, setInterestRate] = useState(6.8)
   const [termYears, setTermYears] = useState(30)
-  const [hasLogged, setHasLogged] = useState(false)
+  const loggedRef = useRef(false)
+  const logFnRef = useRef(logCalculatorUse)
+  logFnRef.current = logCalculatorUse
+
+  function markUsed() {
+    if (!loggedRef.current) {
+      loggedRef.current = true
+      logFnRef.current()
+    }
+  }
+
+  useEffect(() => {
+    const t = setTimeout(markUsed, 1000)
+    return () => clearTimeout(t)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const downPayment = Math.round(homePrice * (downPaymentPct / 100))
   const loanAmount = homePrice - downPayment
@@ -51,22 +65,6 @@ export default function MortgageCalculator({ onContactClick }) {
 
   const totalPaid = monthlyPayment * numPayments
   const totalInterest = totalPaid - loanAmount
-
-  const handleInteract = useCallback(() => {
-    if (!hasLogged) {
-      logCalculatorUse()
-      setHasLogged(true)
-    }
-  }, [hasLogged, logCalculatorUse])
-
-  useEffect(() => {
-    if (hasLogged) return
-    const timer = setTimeout(() => {
-      logCalculatorUse()
-      setHasLogged(true)
-    }, 3000)
-    return () => clearTimeout(timer)
-  }, [hasLogged, logCalculatorUse])
 
   const pctPrincipal = Math.round((loanAmount / totalPaid) * 100)
   const pctInterest = 100 - pctPrincipal
@@ -87,7 +85,7 @@ export default function MortgageCalculator({ onContactClick }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
           {/* Controls */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-8" onChange={handleInteract}>
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-8">
             <Slider
               label="Home Price"
               value={homePrice}
@@ -95,7 +93,7 @@ export default function MortgageCalculator({ onContactClick }) {
               max={2000000}
               step={5000}
               format={v => formatCurrency(v)}
-              onChange={v => { setHomePrice(v); handleInteract() }}
+              onChange={v => { setHomePrice(v); markUsed() }}
             />
             <Slider
               label={`Down Payment (${downPaymentPct}% = ${formatCurrency(downPayment)})`}
@@ -104,7 +102,7 @@ export default function MortgageCalculator({ onContactClick }) {
               max={50}
               step={1}
               format={v => `${v}%`}
-              onChange={v => { setDownPaymentPct(v); handleInteract() }}
+              onChange={v => { setDownPaymentPct(v); markUsed() }}
             />
             <Slider
               label="Interest Rate"
@@ -113,7 +111,7 @@ export default function MortgageCalculator({ onContactClick }) {
               max={12}
               step={0.1}
               format={v => `${v.toFixed(1)}%`}
-              onChange={v => { setInterestRate(v); handleInteract() }}
+              onChange={v => { setInterestRate(v); markUsed() }}
             />
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-3">Loan Term</label>
@@ -121,7 +119,7 @@ export default function MortgageCalculator({ onContactClick }) {
                 {[10, 15, 20, 30].map(y => (
                   <button
                     key={y}
-                    onClick={() => { setTermYears(y); handleInteract() }}
+                    onClick={() => { setTermYears(y); markUsed() }}
                     className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
                       termYears === y
                         ? 'bg-orange-500 border-orange-500 text-white shadow-sm'
