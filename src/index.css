@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-slate-950 text-gray-100 font-sans antialiased;
+    @apply font-sans antialiased;
   }
 
   ::-webkit-scrollbar {

@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Search, Filter, Phone, Mail, ArrowUpDown, Flame } from 'lucide-react'
-import { leads } from '../data/mockData'
+import { Search, Phone, Mail, ArrowUpDown } from 'lucide-react'
 
 function IntentRing({ score, size = 52 }) {
   const radius = (size - 8) / 2
@@ -50,7 +49,7 @@ function SourceBadge({ source }) {
 
 const FILTERS = ['All', 'Hot', 'Warm', 'Cold']
 
-export default function Leads({ setPage, setSelectedLeadId }) {
+export default function Leads({ leads = [], loading = false, setPage, setSelectedLeadId }) {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('All')
   const [sortDir, setSortDir] = useState('desc')

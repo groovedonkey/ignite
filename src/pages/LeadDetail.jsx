@@ -2,9 +2,8 @@ import { useState } from 'react'
 import {
   ArrowLeft, Phone, Mail, Copy, Check, MapPin, Zap,
   Image, DollarSign, Heart, Search, RotateCcw, MessageSquare,
-  Clock, TrendingUp, Home, ExternalLink
+  Clock, TrendingUp, Home
 } from 'lucide-react'
-import { leads } from '../data/mockData'
 
 function IntentRing({ score, size = 80 }) {
   const radius = (size - 10) / 2
@@ -81,7 +80,7 @@ function CopyButton({ text }) {
   )
 }
 
-export default function LeadDetail({ leadId, setPage }) {
+export default function LeadDetail({ leadId, leads = [], setPage }) {
   const lead = leads.find(l => l.id === leadId)
   const [activeTab, setActiveTab] = useState('text')
 

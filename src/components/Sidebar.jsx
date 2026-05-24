@@ -1,13 +1,14 @@
-import { Flame, LayoutDashboard, Users, Bell, Settings, ChevronRight } from 'lucide-react'
-import { stats } from '../data/mockData'
+import { Flame, LayoutDashboard, Users, Bell, LogOut, ChevronRight } from 'lucide-react'
+import { signOut } from 'firebase/auth'
+import { auth } from '../firebase'
 
-const navItems = [
+const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'leads', label: 'All Leads', icon: Users },
-  { id: 'alerts', label: 'Alerts', icon: Bell, badge: stats.activeAlerts },
+  { id: 'alerts', label: 'Alerts', icon: Bell },
 ]
 
-export default function Sidebar({ page, setPage }) {
+export default function Sidebar({ page, setPage, user, alertCount = 0 }) {
   return (
     <aside className="w-64 min-h-screen bg-gray-900 border-r border-gray-800 flex flex-col flex-shrink-0">
       {/* Logo */}
@@ -25,7 +26,8 @@ export default function Sidebar({ page, setPage }) {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map(({ id, label, icon: Icon, badge }) => {
+        {NAV.map(({ id, label, icon: Icon }) => {
+          const badge = id === 'alerts' ? alertCount : 0
           const active = page === id
           return (
             <button
@@ -54,23 +56,25 @@ export default function Sidebar({ page, setPage }) {
 
       {/* Footer */}
       <div className="px-3 pb-4 border-t border-gray-800 pt-4">
-        <button
-          onClick={() => setPage('settings')}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:text-gray-100 hover:bg-gray-800 transition-all"
-        >
-          <Settings size={17} className="text-gray-500" />
-          Settings
-        </button>
-        <div className="mt-3 px-3">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-              JP
+        <div className="flex items-center gap-3 px-3 mb-3">
+          {user?.photoURL ? (
+            <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full flex-shrink-0" />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+              {(user?.displayName || user?.email || 'A').charAt(0).toUpperCase()}
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-gray-200 truncate">Jason Patino</p>
-              <p className="text-xs text-gray-500 truncate">Lead Agent</p>
-            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-gray-200 truncate">{user?.displayName || 'Agent'}</p>
+            <p className="text-xs text-gray-500 truncate">Lead Agent</p>
           </div>
+          <button
+            onClick={() => signOut(auth)}
+            className="text-gray-600 hover:text-gray-300 transition-colors"
+            title="Sign out"
+          >
+            <LogOut size={15} />
+          </button>
         </div>
       </div>
     </aside>

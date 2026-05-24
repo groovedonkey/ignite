@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Prospects: anyone can create (public contact form),
+    // only authenticated realtor can read/update
+    match /prospects/{prospectId} {
+      allow create: if true;
+      allow read, update: if request.auth != null
+        && request.auth.token.email == 'dro@groovedonkey.com';
+      allow delete: if false;
+    }
+
+    // Sessions: public read/write for anonymous activity tracking
+    match /sessions/{sessionId} {
+      allow read, write: if true;
+    }
+  }
+}

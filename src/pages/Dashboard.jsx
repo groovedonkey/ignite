@@ -1,5 +1,5 @@
-import { Flame, Users, TrendingUp, Bell, ArrowRight, Phone, Mail, ChevronUp } from 'lucide-react'
-import { leads, morningFive, alerts, stats, agentName } from '../data/mockData'
+import { Flame, Users, TrendingUp, Bell, ArrowRight, Phone, Mail } from 'lucide-react'
+import { REALTOR } from '../config'
 
 function IntentRing({ score, size = 64 }) {
   const radius = (size - 8) / 2
@@ -55,7 +55,16 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
   )
 }
 
-export default function Dashboard({ setPage, setSelectedLeadId }) {
+export default function Dashboard({ leads = [], loading = false, setPage, setSelectedLeadId }) {
+  const morningFive = leads.filter(l => l.temperature === 'hot').slice(0, 5)
+  const alerts = leads.filter(l => l.isAlerted)
+  const stats = {
+    totalLeads: leads.length,
+    hotLeads: leads.filter(l => l.temperature === 'hot').length,
+    avgScore: leads.length ? Math.round(leads.reduce((s, l) => s + l.intentScore, 0) / leads.length) : 0,
+    activeAlerts: alerts.length,
+  }
+  const agentName = REALTOR.name.split(' ')[0]
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
 
   return (
@@ -64,6 +73,7 @@ export default function Dashboard({ setPage, setSelectedLeadId }) {
       <div className="mb-8">
         <p className="text-sm text-gray-500 font-medium mb-1">{today}</p>
         <h2 className="text-3xl font-bold text-white">Good morning, {agentName} 👋</h2>
+        {loading && <p className="text-xs text-gray-600 mt-1">Loading leads…</p>}
         <p className="text-gray-400 mt-1">You have <span className="text-orange-400 font-semibold">{stats.activeAlerts} alerts</span> and <span className="text-orange-400 font-semibold">{stats.hotLeads} hot leads</span> ready for action today.</p>
       </div>
 

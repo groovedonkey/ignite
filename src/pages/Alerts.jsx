@@ -1,5 +1,4 @@
 import { Bell, TrendingDown, Ghost, RefreshCw, Phone, Mail, ArrowRight } from 'lucide-react'
-import { alerts, leads } from '../data/mockData'
 
 const alertConfig = {
   cooling: {
@@ -44,7 +43,8 @@ function IntentRing({ score, size = 56 }) {
   )
 }
 
-export default function Alerts({ setPage, setSelectedLeadId }) {
+export default function Alerts({ leads = [], loading = false, setPage, setSelectedLeadId }) {
+  const alerts = leads.filter(l => l.isAlerted)
   const totalLeads = leads.length
   const hotCount = leads.filter(l => l.temperature === 'hot').length
 
