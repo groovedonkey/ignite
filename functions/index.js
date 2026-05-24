@@ -32,7 +32,7 @@ exports.onProspectCreated = onDocumentCreated(
 
     try {
       const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value())
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
 
       const usedCalculator = prospect.usedCalculator === true
 
@@ -64,7 +64,7 @@ Write a warm, natural, 1-2 sentence outreach message the agent (${REALTOR_NAME})
     if (emailUser && emailPass) {
       try {
         const transporter = nodemailer.createTransport({
-          host: EMAIL_HOST.value() || 'smtp.gmail.com',
+          host: (EMAIL_HOST.value() || 'smtp.gmail.com').trim(),
           port: 587,
           secure: false,
           auth: { user: emailUser, pass: emailPass },

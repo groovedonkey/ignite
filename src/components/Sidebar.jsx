@@ -1,4 +1,4 @@
-import { Flame, LayoutDashboard, Users, Bell, ChevronRight } from 'lucide-react'
+import { Flame, LayoutDashboard, Users, Bell, ChevronRight, X } from 'lucide-react'
 import { REALTOR } from '../config'
 
 const NAV = [
@@ -7,19 +7,30 @@ const NAV = [
   { id: 'alerts', label: 'Alerts', icon: Bell },
 ]
 
-export default function Sidebar({ page, setPage, alertCount = 0 }) {
+export default function Sidebar({ page, setPage, alertCount = 0, isOpen = false, onClose }) {
   return (
-    <aside className="w-64 min-h-screen bg-gray-900 border-r border-gray-800 flex flex-col flex-shrink-0">
+    <aside className={`
+      fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 border-r border-gray-800 flex flex-col flex-shrink-0
+      transform transition-transform duration-200 ease-in-out
+      md:relative md:translate-x-0 md:flex
+      ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+    `}>
       {/* Logo */}
       <div className="px-6 py-5 border-b border-gray-800">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
             <Flame size={18} className="text-white" />
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="text-lg font-bold text-white tracking-tight">Ignite</h1>
             <p className="text-xs text-gray-500 -mt-0.5">Lead Intent Engine</p>
           </div>
+          <button
+            onClick={onClose}
+            className="md:hidden text-gray-500 hover:text-white transition-colors p-1"
+          >
+            <X size={18} />
+          </button>
         </div>
       </div>
 
