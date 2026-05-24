@@ -7,13 +7,16 @@ const { GoogleGenerativeAI } = require('@google/generative-ai')
 admin.initializeApp()
 
 const GEMINI_API_KEY = defineSecret('GEMINI_API_KEY')
+const EMAIL_USER = defineSecret('EMAIL_USER')
+const EMAIL_PASS = defineSecret('EMAIL_PASS')
+const EMAIL_HOST = defineSecret('EMAIL_HOST')
 
 const REALTOR_EMAIL = 'dro@groovedonkey.com'
 const REALTOR_NAME = 'Pedro Gonzalez'
-const CRM_URL = 'https://ignite-33d2d.web.app/portal'
+const CRM_URL = 'https://ignite-crm.web.app/portal'
 
 exports.onProspectCreated = onDocumentCreated(
-  { document: 'prospects/{prospectId}', secrets: [GEMINI_API_KEY] },
+  { document: 'prospects/{prospectId}', secrets: [GEMINI_API_KEY, EMAIL_USER, EMAIL_PASS, EMAIL_HOST] },
   async (event) => {
     const prospect = event.data.data()
     const prospectId = event.params.prospectId
@@ -55,13 +58,13 @@ Write a warm, natural, 1-2 sentence outreach message the agent (${REALTOR_NAME})
       console.error('Gemini error:', err)
     }
 
-    const emailUser = process.env.EMAIL_USER
-    const emailPass = process.env.EMAIL_PASS
+    const emailUser = EMAIL_USER.value()
+    const emailPass = EMAIL_PASS.value()
 
     if (emailUser && emailPass) {
       try {
         const transporter = nodemailer.createTransport({
-          host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+          host: EMAIL_HOST.value() || 'smtp.gmail.com',
           port: 587,
           secure: false,
           auth: { user: emailUser, pass: emailPass },
