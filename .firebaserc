@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "ignite-33d2d"
+  },
+  "targets": {
+    "ignite-33d2d": {
+      "hosting": {
+        "prospect": ["ignite-realty"],
+        "crm": ["ignite-crm"]
+      }
+    }
+  }
+}
