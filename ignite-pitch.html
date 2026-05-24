@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ignite — Lead Intelligence Platform for Real Estate</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #f97316;
+      --orange-light: #fed7aa;
+      --orange-dark: #c2410c;
+      --red: #dc2626;
+      --dark: #0f172a;
+      --dark2: #1e293b;
+      --dark3: #334155;
+      --mid: #475569;
+      --light: #94a3b8;
+      --lighter: #cbd5e1;
+      --white: #ffffff;
+      --blue: #3b82f6;
+      --green: #22c55e;
+      --purple: #a855f7;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--white);
+      color: var(--dark);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── PAGE BREAKS ── */
+    .page { page-break-after: always; }
+    .no-break { page-break-inside: avoid; }
+
+    @media print {
+      body { font-size: 12px; }
+      .page { page-break-after: always; }
+      .no-break { page-break-inside: avoid; }
+    }
+
+    /* ── COVER ── */
+    .cover {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 60px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(249,115,22,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .cover::after {
+      content: '';
+      position: absolute;
+      bottom: -200px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(220,38,38,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .cover-logo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .flame-icon {
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, #f97316, #dc2626);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 20px 40px rgba(249,115,22,0.3);
+    }
+
+    .logo-text h1 {
+      font-size: 36px;
+      font-weight: 900;
+      color: white;
+      letter-spacing: -1px;
+    }
+
+    .logo-text p {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .cover-headline {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+    }
+
+    .cover-headline h2 {
+      font-size: 52px;
+      font-weight: 900;
+      color: white;
+      line-height: 1.1;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+    }
+
+    .cover-headline h2 span {
+      background: linear-gradient(135deg, #f97316, #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cover-headline p {
+      font-size: 18px;
+      color: #94a3b8;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      font-weight: 400;
+    }
+
+    .cover-badges {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge {
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    .badge-orange { background: rgba(249,115,22,0.15); color: #fb923c; border-color: rgba(249,115,22,0.3); }
+    .badge-blue { background: rgba(59,130,246,0.15); color: #60a5fa; border-color: rgba(59,130,246,0.3); }
+    .badge-green { background: rgba(34,197,94,0.15); color: #4ade80; border-color: rgba(34,197,94,0.3); }
+
+    .cover-footer {
+      margin-top: 80px;
+      position: relative;
+      z-index: 1;
+      color: #475569;
+      font-size: 12px;
+    }
+
+    /* ── SECTION WRAPPER ── */
+    .section {
+      padding: 64px 72px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-dark {
+      background: var(--dark);
+      color: white;
+      max-width: 100%;
+      padding: 64px 72px;
+    }
+
+    .section-dark .section-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-accent {
+      background: linear-gradient(135deg, #fff7ed, #fef3c7);
+      max-width: 100%;
+      padding: 64px 72px;
+    }
+
+    .section-accent .section-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── TYPOGRAPHY ── */
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--orange);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      font-size: 16px;
+      color: var(--mid);
+      line-height: 1.7;
+      margin-bottom: 48px;
+      max-width: 640px;
+    }
+
+    .section-dark .section-title { color: white; }
+    .section-dark .section-subtitle { color: #94a3b8; }
+
+    /* ── PROBLEM SECTION ── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .problem-card {
+      background: #fff5f5;
+      border: 1px solid #fecaca;
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .problem-card .emoji { font-size: 28px; margin-bottom: 12px; }
+    .problem-card h4 { font-size: 15px; font-weight: 700; color: #991b1b; margin-bottom: 8px; }
+    .problem-card p { font-size: 13px; color: #b91c1c; line-height: 1.6; }
+
+    /* ── FEATURE CARDS ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .feature-card.orange::before { background: linear-gradient(90deg, #f97316, #fbbf24); }
+    .feature-card.blue::before { background: linear-gradient(90deg, #3b82f6, #06b6d4); }
+    .feature-card.green::before { background: linear-gradient(90deg, #22c55e, #10b981); }
+    .feature-card.purple::before { background: linear-gradient(90deg, #a855f7, #ec4899); }
+
+    .feature-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .feature-icon.orange { background: rgba(249,115,22,0.1); }
+    .feature-icon.blue { background: rgba(59,130,246,0.1); }
+    .feature-icon.green { background: rgba(34,197,94,0.1); }
+    .feature-icon.purple { background: rgba(168,85,247,0.1); }
+
+    .feature-card h4 { font-size: 17px; font-weight: 700; margin-bottom: 10px; color: var(--dark); }
+    .feature-card p { font-size: 13px; color: var(--mid); line-height: 1.65; margin-bottom: 16px; }
+
+    .feature-list { list-style: none; }
+    .feature-list li {
+      font-size: 12.5px;
+      color: var(--dark3);
+      padding: 5px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .feature-list li:first-child { border-top: none; }
+    .feature-list li::before { content: '✓'; font-weight: 700; color: var(--green); flex-shrink: 0; margin-top: 1px; }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: flex; flex-direction: column; gap: 0; }
+
+    .step {
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      padding: 24px 0;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .step:last-child { border-bottom: none; }
+
+    .step-num {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f97316, #dc2626);
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-content h4 { font-size: 16px; font-weight: 700; color: white; margin-bottom: 6px; }
+    .step-content p { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+
+    /* ── SCORING ── */
+    .scoring-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 32px;
+    }
+
+    .scoring-table th {
+      background: var(--dark2);
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    .scoring-table th:first-child { border-radius: 12px 0 0 12px; }
+    .scoring-table th:last-child { border-radius: 0 12px 12px 0; }
+
+    .scoring-table td {
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #cbd5e1;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .scoring-table tr:last-child td { border-bottom: none; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .pill-orange { background: rgba(249,115,22,0.2); color: #fb923c; }
+    .pill-blue { background: rgba(59,130,246,0.2); color: #60a5fa; }
+    .pill-green { background: rgba(34,197,94,0.2); color: #4ade80; }
+    .pill-purple { background: rgba(168,85,247,0.2); color: #c084fc; }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin: 40px 0;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 28px 16px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border-radius: 16px;
+      border: 1px solid #334155;
+    }
+
+    .stat-num {
+      font-size: 38px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f97316, #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label { font-size: 12px; color: #64748b; font-weight: 500; }
+
+    /* ── AI SECTION ── */
+    .ai-card {
+      background: linear-gradient(135deg, #1e1b4b, #0f172a);
+      border: 1px solid #312e81;
+      border-radius: 20px;
+      padding: 32px;
+      margin-top: 32px;
+    }
+
+    .ai-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(168,85,247,0.2);
+      border: 1px solid rgba(168,85,247,0.3);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #c084fc;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .ai-example {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px 24px;
+      font-size: 14px;
+      color: #e2e8f0;
+      line-height: 1.8;
+      font-style: italic;
+    }
+
+    .ai-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .ai-action-btn {
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    .ai-action-btn.green { background: rgba(34,197,94,0.15); color: #4ade80; border-color: rgba(34,197,94,0.3); }
+    .ai-action-btn.blue { background: rgba(59,130,246,0.15); color: #60a5fa; border-color: rgba(59,130,246,0.3); }
+    .ai-action-btn.gray { background: rgba(255,255,255,0.05); color: #94a3b8; border-color: rgba(255,255,255,0.1); }
+
+    /* ── PROSPECT FLOW ── */
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-top: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .flow-step {
+      text-align: center;
+      padding: 20px 16px;
+      flex: 1;
+      min-width: 100px;
+    }
+
+    .flow-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #f97316, #dc2626);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      margin: 0 auto 12px;
+      box-shadow: 0 8px 24px rgba(249,115,22,0.25);
+    }
+
+    .flow-step h5 { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .flow-step p { font-size: 11px; color: var(--mid); }
+
+    .flow-arrow {
+      font-size: 20px;
+      color: #cbd5e1;
+      flex-shrink: 0;
+      padding: 0 4px;
+    }
+
+    /* ── BENEFITS ── */
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .benefit-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .benefit-card .icon { font-size: 32px; margin-bottom: 12px; }
+    .benefit-card h4 { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .benefit-card p { font-size: 12.5px; color: var(--mid); line-height: 1.6; }
+
+    /* ── QUOTE ── */
+    .quote-section {
+      background: linear-gradient(135deg, #fff7ed, #fef9c3);
+      border-left: 4px solid var(--orange);
+      padding: 28px 32px;
+      border-radius: 0 16px 16px 0;
+      margin: 40px 0;
+    }
+
+    .quote-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--dark);
+      line-height: 1.6;
+      font-style: italic;
+      margin-bottom: 12px;
+    }
+
+    .quote-attr { font-size: 12px; color: var(--mid); font-weight: 500; }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      padding: 80px 72px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(249,115,22,0.12) 0%, transparent 70%);
+    }
+
+    .cta-section h2 {
+      font-size: 42px;
+      font-weight: 900;
+      color: white;
+      letter-spacing: -1.5px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-section h2 span {
+      background: linear-gradient(135deg, #f97316, #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cta-section p {
+      font-size: 16px;
+      color: #94a3b8;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-contact {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cta-contact p { margin: 0; font-size: 14px; color: #64748b; }
+    .cta-contact a { color: #fb923c; font-weight: 600; font-size: 16px; text-decoration: none; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+      margin: 48px 0;
+    }
+
+    .divider-dark {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #334155, transparent);
+      margin: 40px 0;
+    }
+
+    /* ── COMPARISON ── */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .compare-col {
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .compare-header {
+      padding: 16px 24px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .compare-header.bad { background: #fee2e2; color: #991b1b; }
+    .compare-header.good { background: linear-gradient(135deg, #f97316, #dc2626); color: white; }
+
+    .compare-body { border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 20px 20px; }
+
+    .compare-item {
+      padding: 12px 24px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .compare-item:last-child { border-bottom: none; }
+    .compare-item.bad { color: #b91c1c; }
+    .compare-item.good { color: #166534; }
+    .compare-item::before { font-size: 14px; flex-shrink: 0; }
+    .compare-item.bad::before { content: '✗'; color: #ef4444; }
+    .compare-item.good::before { content: '✓'; color: #22c55e; }
+
+    /* ── PAGE NUMBER ── */
+    .page-num {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 11px;
+      padding: 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ COVER ═══ -->
+<div class="cover page">
+  <div class="cover-logo">
+    <div class="flame-icon">🔥</div>
+    <div class="logo-text">
+      <h1>Ignite</h1>
+      <p>Lead Intent Engine</p>
+    </div>
+  </div>
+
+  <div class="cover-headline">
+    <h2>Know Who's Ready to Buy <span>Before They Tell You</span></h2>
+    <p>Ignite is an AI-powered lead intelligence platform purpose-built for real estate agents. It captures behavioral signals from your prospects, scores their purchase intent in real time, and drafts your first message — so you always reach out at exactly the right moment.</p>
+    <div class="cover-badges">
+      <span class="badge badge-orange">🧠 AI-Powered Scoring</span>
+      <span class="badge badge-blue">✉ Instant Email Alerts</span>
+      <span class="badge badge-green">📱 Mobile CRM</span>
+    </div>
+  </div>
+
+  <div class="cover-footer">
+    Confidential — Prepared for Prospective Partners &nbsp;·&nbsp; Ignite Lead Intelligence Platform &nbsp;·&nbsp; 2026
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ PROBLEM ═══ -->
+<div class="section page">
+  <div class="eyebrow">The Problem</div>
+  <h2 class="section-title">Real Estate Agents Are Flying Blind</h2>
+  <p class="section-subtitle">You get leads. But you have no idea which ones are serious, which ones just browsed casually, or who is ready to write an offer today. So you either follow up with everyone — wasting time — or you miss the hot ones entirely.</p>
+
+  <div class="problem-grid">
+    <div class="problem-card no-break">
+      <div class="emoji">⏱</div>
+      <h4>Time Wasted on Cold Leads</h4>
+      <p>The average agent spends 60% of follow-up time on prospects who were never ready to buy. That's hours of calls and texts that go nowhere.</p>
+    </div>
+    <div class="problem-card no-break">
+      <div class="emoji">🔔</div>
+      <h4>Hot Leads Go Cold</h4>
+      <p>When a serious buyer fills out a form and doesn't hear back within the hour, they contact another agent. Speed-to-lead is everything — and most agents miss the window.</p>
+    </div>
+    <div class="problem-card no-break">
+      <div class="emoji">💬</div>
+      <h4>Generic Outreach Gets Ignored</h4>
+      <p>"Hi, saw you filled out a form. Let me know if you have questions." This kind of message gets deleted. Buyers expect you to know what they're looking for.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="eyebrow">The Solution</div>
+  <h2 class="section-title">Ignite Tells You Exactly Who to Call and What to Say</h2>
+  <p class="section-subtitle">Ignite watches what every visitor does on your property website — every listing they view, every minute they spend, every time they use the mortgage calculator — and converts that behavior into an intent score. The higher the score, the hotter the lead.</p>
+
+  <div class="flow-row">
+    <div class="flow-step">
+      <div class="flow-icon">🏠</div>
+      <h5>Prospect Visits Site</h5>
+      <p>Browses listings, uses calculator</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-icon">📊</div>
+      <h5>Signals Captured</h5>
+      <p>Every action tracked & scored</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-icon">🧠</div>
+      <h5>AI Generates Opener</h5>
+      <p>Personalized first message drafted</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-icon">🔔</div>
+      <h5>You Get Alerted</h5>
+      <p>Email alert sent instantly</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-icon">🤝</div>
+      <h5>Close the Deal</h5>
+      <p>Reach out at peak intent</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ FEATURES ═══ -->
+<div class="section page">
+  <div class="eyebrow">Core Features</div>
+  <h2 class="section-title">Everything You Need to Win More Listings</h2>
+  <p class="section-subtitle">Ignite is a complete ecosystem — a branded prospect-facing website, a smart CRM, an AI writer, and an instant alert system all working together.</p>
+
+  <div class="features-grid">
+
+    <div class="feature-card orange no-break">
+      <div class="feature-icon orange">🌐</div>
+      <h4>Branded Prospect Website</h4>
+      <p>Your leads start here. A stunning, mobile-optimized property site built for your market — connected directly to your MLS so your listings are always live and accurate.</p>
+      <ul class="feature-list">
+        <li>Custom branded for your brokerage and territory</li>
+        <li>MLS-connected listings — always current, no manual updates</li>
+        <li>Interactive mortgage calculator with live payment estimates</li>
+        <li>Contact form that feeds directly into your CRM</li>
+        <li>Every visitor action silently tracked in the background</li>
+      </ul>
+    </div>
+
+    <div class="feature-card blue no-break">
+      <div class="feature-icon blue">🎯</div>
+      <h4>Real-Time Intent Scoring</h4>
+      <p>Every prospect receives a live intent score from 0–100 based on their behavioral footprint. No more guessing who is serious.</p>
+      <ul class="feature-list">
+        <li>Score updates automatically as signals accumulate</li>
+        <li>Hot (80+), Warm (40–79), and Cold (&lt;40) tiers</li>
+        <li>Visual score ring on every lead card</li>
+        <li>Breakdown: depth, recency, and financial intent</li>
+        <li>Mortgage calculator engagement captured as a financial signal</li>
+      </ul>
+    </div>
+
+    <div class="feature-card green no-break">
+      <div class="feature-icon green">📋</div>
+      <h4>Smart CRM Dashboard</h4>
+      <p>A real estate CRM built around intent — not just a contact list. Every lead shows you exactly what the prospect did and how urgent your follow-up should be.</p>
+      <ul class="feature-list">
+        <li>Priority Contacts: top 5 highest-intent leads, always current</li>
+        <li>Full behavioral activity timeline per lead</li>
+        <li>Properties of interest pulled from browsing session</li>
+        <li>Overdue follow-up alerts with day count</li>
+        <li>Search, filter, and sort across all leads</li>
+      </ul>
+    </div>
+
+    <div class="feature-card purple no-break">
+      <div class="feature-icon purple">✨</div>
+      <h4>AI SmartDraft</h4>
+      <p>Powered by Google Gemini AI. For every new lead, Ignite writes a personalized first-contact message referencing what they actually looked at — so your outreach never feels generic.</p>
+      <ul class="feature-list">
+        <li>References listings viewed and time spent on site</li>
+        <li>Calls out mortgage calculator use as a financial signal</li>
+        <li>One-tap to send as a text message or email</li>
+        <li>Copy to clipboard for use in any other channel</li>
+        <li>Reveal on demand with the Initiate button</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ SCORING ═══ -->
+<div class="section-dark page">
+  <div class="section-inner">
+    <div class="eyebrow">Intent Scoring Engine</div>
+    <h2 class="section-title">How Ignite Scores Your Leads</h2>
+    <p class="section-subtitle">The intent score is not a guess — it is calculated from a weighted model of real behavioral signals. Here is exactly what goes into it.</p>
+
+    <table class="scoring-table">
+      <thead>
+        <tr>
+          <th>Behavioral Signal</th>
+          <th>What It Means</th>
+          <th>Weight</th>
+          <th>Tier</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>📸 Listings Viewed (depth)</td>
+          <td>Number and variety of property pages opened</td>
+          <td>Up to 30 pts</td>
+          <td><span class="pill pill-blue">Depth</span></td>
+        </tr>
+        <tr>
+          <td>⏱ Time on Site</td>
+          <td>Total minutes spent on the property website</td>
+          <td>Up to 20 pts</td>
+          <td><span class="pill pill-blue">Depth</span></td>
+        </tr>
+        <tr>
+          <td>📝 Contact Form Submitted</td>
+          <td>Prospect actively reached out — strong buying signal</td>
+          <td>+20 pts</td>
+          <td><span class="pill pill-orange">Intent</span></td>
+        </tr>
+        <tr>
+          <td>💰 Budget Specified</td>
+          <td>Prospect disclosed a purchase price range</td>
+          <td>+10 pts</td>
+          <td><span class="pill pill-green">Financial</span></td>
+        </tr>
+        <tr>
+          <td>🕐 Recency</td>
+          <td>How recently the prospect was active on site</td>
+          <td>Decays over time</td>
+          <td><span class="pill pill-purple">Recency</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="divider-dark"></div>
+
+    <div class="stats-row">
+      <div class="stat-card no-break">
+        <div class="stat-num">0–100</div>
+        <div class="stat-label">Intent Score Range</div>
+      </div>
+      <div class="stat-card no-break">
+        <div class="stat-num">80+</div>
+        <div class="stat-label">Threshold for "Hot" Lead</div>
+      </div>
+      <div class="stat-card no-break">
+        <div class="stat-num">Real-time</div>
+        <div class="stat-label">Score Update Frequency</div>
+      </div>
+      <div class="stat-card no-break">
+        <div class="stat-num">Top 5</div>
+        <div class="stat-label">Priority Contacts Always Shown</div>
+      </div>
+    </div>
+
+    <div style="background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.25); border-radius: 16px; padding: 24px 28px; margin-top: 8px;">
+      <p style="font-size: 14px; color: #fed7aa; line-height: 1.7;">
+        <strong style="color: #fb923c;">Priority Contacts</strong> — the top section of your dashboard — updates automatically as new leads come in and scores shift. If a prospect who was cold yesterday ran the mortgage calculator today and submitted a form, they jump to the top of your list immediately. No refreshing required.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ AI SMARTDRAFT ═══ -->
+<div class="section page">
+  <div class="eyebrow">AI SmartDraft</div>
+  <h2 class="section-title">Your AI-Written First Message, Ready in Seconds</h2>
+  <p class="section-subtitle">When a new lead comes in, Ignite's AI engine analyzes everything that prospect did — what they browsed, how long they stayed, whether they ran loan numbers — and writes a personalized conversation starter just for them.</p>
+
+  <div class="ai-card no-break">
+    <div class="ai-card-header">
+      <span class="ai-badge">✨ AI SmartDraft — Sample Output</span>
+    </div>
+    <div class="ai-example">
+      "Hey Sarah — I noticed you spent some time on the Altama Ave property and ran through the mortgage calculator while you were browsing. That tells me you're thinking seriously about your numbers, which I love to see. I specialize in this part of Brunswick and I'd love to walk you through what comparable homes have been selling for recently. Would you have 15 minutes this week for a quick call? No pressure — just want to make sure you have the right information before you make any decisions."
+    </div>
+    <div class="ai-actions">
+      <span class="ai-action-btn gray">📋 Copy</span>
+      <span class="ai-action-btn green">💬 Text Sarah</span>
+      <span class="ai-action-btn blue">✉ Email Sarah</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="eyebrow">Instant Alerts</div>
+  <h2 class="section-title">You'll Know the Second a Lead Comes In</h2>
+  <p class="section-subtitle">The moment a prospect submits your contact form, Ignite fires an email alert to you with everything you need to follow up immediately — no logging into the CRM required.</p>
+
+  <div class="features-grid" style="margin-top: 24px;">
+    <div class="feature-card orange no-break" style="padding: 22px;">
+      <h4 style="margin-bottom: 8px;">📬 What's in the Alert Email</h4>
+      <ul class="feature-list">
+        <li>Full name, phone number, and email address</li>
+        <li>Their stated intent and budget</li>
+        <li>Every listing they viewed during their session</li>
+        <li>Total time spent on site</li>
+        <li>Whether they used the mortgage calculator</li>
+        <li>Their message or note from the form</li>
+        <li>The AI-generated suggested opening message</li>
+        <li>Direct link to their lead profile in your CRM</li>
+      </ul>
+    </div>
+    <div class="feature-card blue no-break" style="padding: 22px;">
+      <h4 style="margin-bottom: 8px;">⚡ Speed-to-Lead Advantage</h4>
+      <p style="font-size: 13px; color: var(--mid); margin-bottom: 16px;">Research consistently shows that response time is the single biggest factor in lead conversion. Ignite is designed to get you in front of serious buyers before they contact anyone else.</p>
+      <ul class="feature-list">
+        <li>Alert sent within seconds of form submission</li>
+        <li>Pre-written message ready to send immediately</li>
+        <li>One tap to text or email directly from the CRM</li>
+        <li>No manual data entry — everything is captured automatically</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ COMPARISON ═══ -->
+<div class="section-accent page">
+  <div class="section-inner">
+    <div class="eyebrow">Why Ignite</div>
+    <h2 class="section-title">Not Just Another CRM</h2>
+    <p class="section-subtitle">Most real estate CRMs are contact databases with reminders bolted on. Ignite is fundamentally different — it tells you <em>who</em> to contact, <em>when</em> to contact them, and <em>what to say</em>.</p>
+
+    <div class="comparison-grid">
+      <div class="compare-col no-break">
+        <div class="compare-header bad">❌ Traditional CRM Approach</div>
+        <div class="compare-body">
+          <div class="compare-item bad">Treats every lead the same regardless of behavior</div>
+          <div class="compare-item bad">You write every follow-up message from scratch</div>
+          <div class="compare-item bad">No visibility into what the prospect actually did</div>
+          <div class="compare-item bad">Alerts you days later — if at all</div>
+          <div class="compare-item bad">Separate tools for website, CRM, and email</div>
+          <div class="compare-item bad">Generic templates that feel cold and impersonal</div>
+          <div class="compare-item bad">No mobile experience — desktop only</div>
+        </div>
+      </div>
+      <div class="compare-col no-break">
+        <div class="compare-header good">✅ The Ignite Approach</div>
+        <div class="compare-body">
+          <div class="compare-item good">Intent score ranks leads by real buying signals</div>
+          <div class="compare-item good">AI drafts a personalized opener for every lead</div>
+          <div class="compare-item good">Full behavioral timeline: listings, time, calculator</div>
+          <div class="compare-item good">Email alert fires within seconds of form submission</div>
+          <div class="compare-item good">End-to-end platform: site + CRM + AI + alerts</div>
+          <div class="compare-item good">Messages reference real data from their session</div>
+          <div class="compare-item good">Fully mobile-responsive CRM with slide-in navigation</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-section no-break" style="margin-top: 48px;">
+      <div class="quote-text">"The difference between closing a lead and losing one often comes down to who called first — and whether they sounded like they knew something about me."</div>
+      <div class="quote-attr">— A perspective shared consistently by home buyers across the industry</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ BENEFITS ═══ -->
+<div class="section page">
+  <div class="eyebrow">Agent Benefits</div>
+  <h2 class="section-title">Built to Make Agents More Effective, Every Day</h2>
+  <p class="section-subtitle">Ignite is designed with the working agent in mind. It runs in the background, surfaces the right information at the right time, and gets out of your way.</p>
+
+  <div class="benefits-grid">
+    <div class="benefit-card no-break">
+      <div class="icon">⚡</div>
+      <h4>Immediate Awareness</h4>
+      <p>The moment a prospect submits your form, you know — with everything you need to make that first call count.</p>
+    </div>
+    <div class="benefit-card no-break">
+      <div class="icon">🎯</div>
+      <h4>Focus on What Matters</h4>
+      <p>Stop chasing cold leads. Your Priority Contacts list always shows the five highest-intent prospects, ranked in real time.</p>
+    </div>
+    <div class="benefit-card no-break">
+      <div class="icon">✍️</div>
+      <h4>Never Write Cold Intros Again</h4>
+      <p>The AI SmartDraft gives you a polished, personalized opener for every lead — before you even open the CRM.</p>
+    </div>
+    <div class="benefit-card no-break">
+      <div class="icon">📱</div>
+      <h4>Works on Any Device</h4>
+      <p>The CRM is fully mobile-responsive. Review leads, initiate AI drafts, and text or email prospects directly from your phone.</p>
+    </div>
+    <div class="benefit-card no-break">
+      <div class="icon">🏡</div>
+      <h4>Hyper-Local by Design</h4>
+      <p>Your property site is built and branded for your specific market — listings, photography, copy, and neighborhood context all customized for your territory.</p>
+    </div>
+    <div class="benefit-card no-break">
+      <div class="icon">🔒</div>
+      <h4>Your Data, Your Leads</h4>
+      <p>All prospect data is stored securely in your own Firebase project. No shared databases, no third-party data brokers, no lead recycling.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="eyebrow">How It Works End-to-End</div>
+  <h2 class="section-title" style="margin-bottom: 8px;">The Complete Ignite Workflow</h2>
+</div>
+
+<!-- ═══════════════════════════════════════════ HOW IT WORKS ═══ -->
+<div class="section-dark page">
+  <div class="section-inner">
+    <div class="steps">
+      <div class="step no-break">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Prospect Discovers Your Website</h4>
+          <p>A buyer finds your branded property site through a referral, social media, or search. The site is fast, beautiful, and loaded with relevant local listings for your market. A session tracker begins recording the moment they arrive — invisibly and without interrupting their experience.</p>
+        </div>
+      </div>
+      <div class="step no-break">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>They Browse, Calculate, and Engage</h4>
+          <p>As the visitor clicks through MLS-connected listings, Ignite logs each one. If they open the mortgage calculator and adjust the sliders, that behavior is captured as a financial intent signal. Their total time on site is tracked. Every meaningful action is recorded silently in real time.</p>
+        </div>
+      </div>
+      <div class="step no-break">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>They Submit the Contact Form</h4>
+          <p>When the prospect decides to reach out, they fill in their name, phone, email, intent (buying, selling, renting), budget range, and an optional message. On submission, their entire behavioral session is packaged with this contact information and written to your secure database.</p>
+        </div>
+      </div>
+      <div class="step no-break">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Ignite Scores the Lead and Triggers the AI</h4>
+          <p>Within seconds, Ignite calculates the intent score from all captured signals. Simultaneously, the Google Gemini AI engine reads the prospect's full profile — their browsing behavior, calculator usage, budget, and message — and composes a personalized first-contact message specifically for this person.</p>
+        </div>
+      </div>
+      <div class="step no-break">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>You Receive an Instant Email Alert</h4>
+          <p>An alert email lands in your inbox within seconds. It contains the prospect's full contact details, a summary of everything they did on site, and the AI-generated suggested opener. You have everything you need to make a high-quality first call without opening a single app.</p>
+        </div>
+      </div>
+      <div class="step no-break">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>You Act from the CRM on Any Device</h4>
+          <p>Open your Ignite CRM from your phone or laptop. The new lead appears at the top of Priority Contacts if their intent score ranks them there. Click into their profile to see the full behavioral timeline, hit Initiate to reveal the AI SmartDraft, then tap Text or Email to send it in one action.</p>
+        </div>
+      </div>
+      <div class="step no-break">
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <h4>Scores Evolve. Priority Contacts Stay Current.</h4>
+          <p>As leads age or new ones come in, intent scores update automatically. The Priority Contacts dashboard always reflects the current top five — so you always know where your energy is best spent, no matter how many leads are in the system.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ CTA ═══ -->
+<div class="cta-section">
+  <h2>Ready to Work Smarter<br>and <span>Close More Deals?</span></h2>
+  <p>Join agents who are already using behavioral intelligence to prioritize their pipeline, personalize their outreach, and respond to serious buyers before the competition even knows they exist.</p>
+
+  <div class="cta-contact">
+    <p>Get in touch to schedule a personalized walkthrough</p>
+    <a href="mailto:dro@groovedonkey.com">dro@groovedonkey.com</a>
+    <p style="margin-top: 8px; font-size: 13px;">Pedro Gonzalez &nbsp;·&nbsp; Groove Donkey Realtyworks &nbsp;·&nbsp; Brunswick, GA</p>
+  </div>
+</div>
+
+<div class="page-num">
+  Ignite Lead Intelligence Platform &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; dro@groovedonkey.com
+</div>
+
+</body>
+</html>
