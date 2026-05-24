@@ -1,6 +1,5 @@
-import { Flame, LayoutDashboard, Users, Bell, LogOut, ChevronRight } from 'lucide-react'
-import { signOut } from 'firebase/auth'
-import { auth } from '../firebase'
+import { Flame, LayoutDashboard, Users, Bell, ChevronRight } from 'lucide-react'
+import { REALTOR } from '../config'
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -8,7 +7,7 @@ const NAV = [
   { id: 'alerts', label: 'Alerts', icon: Bell },
 ]
 
-export default function Sidebar({ page, setPage, user, alertCount = 0 }) {
+export default function Sidebar({ page, setPage, alertCount = 0 }) {
   return (
     <aside className="w-64 min-h-screen bg-gray-900 border-r border-gray-800 flex flex-col flex-shrink-0">
       {/* Logo */}
@@ -56,25 +55,14 @@ export default function Sidebar({ page, setPage, user, alertCount = 0 }) {
 
       {/* Footer */}
       <div className="px-3 pb-4 border-t border-gray-800 pt-4">
-        <div className="flex items-center gap-3 px-3 mb-3">
-          {user?.photoURL ? (
-            <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full flex-shrink-0" />
-          ) : (
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-              {(user?.displayName || user?.email || 'A').charAt(0).toUpperCase()}
-            </div>
-          )}
+        <div className="flex items-center gap-3 px-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+            {REALTOR.name.charAt(0)}
+          </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-200 truncate">{user?.displayName || 'Agent'}</p>
+            <p className="text-sm font-medium text-gray-200 truncate">{REALTOR.name}</p>
             <p className="text-xs text-gray-500 truncate">Lead Agent</p>
           </div>
-          <button
-            onClick={() => signOut(auth)}
-            className="text-gray-600 hover:text-gray-300 transition-colors"
-            title="Sign out"
-          >
-            <LogOut size={15} />
-          </button>
         </div>
       </div>
     </aside>

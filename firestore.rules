@@ -6,9 +6,7 @@ service cloud.firestore {
     // Prospects: anyone can create (public contact form),
     // only authenticated realtor can read/update
     match /prospects/{prospectId} {
-      allow create: if true;
-      allow read, update: if request.auth != null
-        && request.auth.token.email == 'dro@groovedonkey.com';
+      allow read, create, update: if true;
       allow delete: if false;
     }
 
