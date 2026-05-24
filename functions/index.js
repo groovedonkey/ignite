@@ -9,7 +9,7 @@ admin.initializeApp()
 const GEMINI_API_KEY = defineSecret('GEMINI_API_KEY')
 
 const REALTOR_EMAIL = 'dro@groovedonkey.com'
-const REALTOR_NAME = 'Alex Rivera'
+const REALTOR_NAME = 'Pedro Gonzalez'
 const CRM_URL = 'https://ignite-33d2d.web.app/portal'
 
 exports.onProspectCreated = onDocumentCreated(
@@ -31,7 +31,9 @@ exports.onProspectCreated = onDocumentCreated(
       const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value())
       const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
-      const prompt = `You are helping a real estate agent craft a personalized first-contact message.
+      const usedCalculator = prospect.usedCalculator === true
+
+    const prompt = `You are helping a real estate agent craft a personalized first-contact message.
 
 A prospect named ${firstName} ${prospect.lastName || ''} just submitted a contact request on the agent's website.
 
@@ -40,9 +42,10 @@ Here is what you know about them:
 - Budget: ${budget}
 - Listings they viewed: ${listingTitles}
 - Time spent on site: ${timeMin} minute(s)
+- Used the mortgage calculator: ${usedCalculator ? 'Yes — they ran the numbers, strong financial intent signal' : 'No'}
 - Their message: "${message}"
 
-Write a warm, natural, 1-2 sentence outreach message the agent (${REALTOR_NAME}) can use as a text, email opener, or conversation starter. Reference something specific from their visit if possible. Do NOT use generic sales language. Be conversational and genuine. Return ONLY the message text, no quotes, no explanation.`
+Write a warm, natural, 1-2 sentence outreach message the agent (${REALTOR_NAME}) can use as a text, email opener, or conversation starter. If they used the mortgage calculator, reference the financial research angle. Reference something specific from their visit if possible. Do NOT use generic sales language. Be conversational and genuine. Return ONLY the message text, no quotes, no explanation.`
 
       const result = await model.generateContent(prompt)
       aiSuggestion = result.response.text().trim()

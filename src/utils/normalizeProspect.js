@@ -61,6 +61,7 @@ export function normalizeProspect(docSnapshot) {
     raw.budget && raw.budget !== 'Not sure yet' ? raw.budget : null,
     listingsViewed.length > 0 ? `Viewed ${listingsViewed.length} listing${listingsViewed.length > 1 ? 's' : ''}` : null,
     Math.round(timeMins) > 0 ? `${Math.round(timeMins)} min on site` : null,
+    raw.usedCalculator ? 'Used Mortgage Calculator' : null,
   ].filter(Boolean)
 
   const summary = raw.message ||

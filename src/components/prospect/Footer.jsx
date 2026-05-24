@@ -14,7 +14,7 @@ export default function Footer() {
               <span className="font-bold text-lg">{REALTOR.company}</span>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed">
-              Helping Austin families find the home they deserve. Licensed, local, and genuinely invested in your outcome.
+              Helping families find their place in Brunswick and the Golden Isles. Licensed, local, and genuinely invested in your outcome.
             </p>
           </div>
 

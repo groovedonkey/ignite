@@ -18,8 +18,9 @@ export function computeScore(prospect) {
     : 0
 
   const newBonus = prospect.status === 'new' ? 15 : 0
+  const calculatorBonus = prospect.usedCalculator ? 15 : 0
 
-  const raw = listingScore + timeScore + recencyBonus + newBonus - contactPenalty
+  const raw = listingScore + timeScore + recencyBonus + newBonus + calculatorBonus - contactPenalty
   return Math.max(0, Math.min(100, Math.round(raw)))
 }
 

@@ -42,6 +42,7 @@ export default function ContactForm({ onClose }) {
         sessionId: session.sessionId,
         listingsViewed: session.listingsViewed,
         timeOnSite: session.timeOnSite,
+        usedCalculator: session.usedCalculator,
         status: 'new',
         lastContactAt: null,
         aiSuggestion: null,

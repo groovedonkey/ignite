@@ -7,6 +7,7 @@ export function SessionProvider({ children }) {
   const [sessionId] = useState(getOrCreateSessionId)
   const sessionStartRef = useRef(Date.now())
   const viewedListingsRef = useRef([])
+  const usedCalculatorRef = useRef(false)
 
   function logListingView(listing) {
     const already = viewedListingsRef.current.find(l => l.id === listing.id)
@@ -18,16 +19,21 @@ export function SessionProvider({ children }) {
     }
   }
 
+  function logCalculatorUse() {
+    usedCalculatorRef.current = true
+  }
+
   function getSessionSummary() {
     return {
       sessionId,
       listingsViewed: viewedListingsRef.current,
       timeOnSite: Math.round((Date.now() - sessionStartRef.current) / 1000),
+      usedCalculator: usedCalculatorRef.current,
     }
   }
 
   return (
-    <SessionContext.Provider value={{ sessionId, logListingView, getSessionSummary }}>
+    <SessionContext.Provider value={{ sessionId, logListingView, logCalculatorUse, getSessionSummary }}>
       {children}
     </SessionContext.Provider>
   )

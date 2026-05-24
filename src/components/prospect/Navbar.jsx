@@ -28,7 +28,7 @@ export default function Navbar({ onContactClick }) {
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
-          {['Listings', 'About', 'Contact'].map((item) => (
+          {['Listings', 'Calculator', 'About', 'Contact'].map((item) => (
             <button
               key={item}
               onClick={() => {
