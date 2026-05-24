@@ -80,24 +80,9 @@ function CopyButton({ text }) {
   )
 }
 
-function Toggle({ enabled, onChange }) {
-  return (
-    <button
-      onClick={onChange}
-      className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${
-        enabled ? 'bg-blue-500' : 'bg-gray-700'
-      }`}
-    >
-      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 ${
-        enabled ? 'translate-x-5' : 'translate-x-0'
-      }`} />
-    </button>
-  )
-}
-
 export default function LeadDetail({ leadId, leads = [], setPage }) {
   const lead = leads.find(l => l.id === leadId)
-  const [smartDraftEnabled, setSmartDraftEnabled] = useState(true)
+  const [initiated, setInitiated] = useState(false)
 
   if (!lead) return (
     <div className="flex-1 flex items-center justify-center text-gray-500">
@@ -228,15 +213,22 @@ export default function LeadDetail({ leadId, leads = [], setPage }) {
 
           {/* AI SmartDraft */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Sparkles size={16} className="text-blue-400" />
                 AI SmartDraft
               </h3>
-              <Toggle enabled={smartDraftEnabled} onChange={() => setSmartDraftEnabled(e => !e)} />
+              {!initiated && (
+                <button
+                  onClick={() => setInitiated(true)}
+                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-white text-xs font-semibold transition-colors shadow-sm shadow-blue-500/20"
+                >
+                  <Sparkles size={12} /> Initiate
+                </button>
+              )}
             </div>
 
-            {smartDraftEnabled && (
+            {initiated && (
               <>
                 <p className="text-xs text-gray-500 mt-1 mb-4">AI-generated conversation starter based on {firstName}'s behavior</p>
                 {lead.aiSuggestion ? (
