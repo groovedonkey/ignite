@@ -2,7 +2,7 @@ import { useState } from 'react'
 import {
   ArrowLeft, Phone, Mail, Copy, Check, MapPin, Zap,
   Image, DollarSign, Heart, Search, RotateCcw, MessageSquare,
-  Clock, TrendingUp, Home
+  Clock, TrendingUp, Home, Sparkles
 } from 'lucide-react'
 
 function IntentRing({ score, size = 80 }) {
@@ -80,9 +80,24 @@ function CopyButton({ text }) {
   )
 }
 
+function Toggle({ enabled, onChange }) {
+  return (
+    <button
+      onClick={onChange}
+      className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${
+        enabled ? 'bg-blue-500' : 'bg-gray-700'
+      }`}
+    >
+      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 ${
+        enabled ? 'translate-x-5' : 'translate-x-0'
+      }`} />
+    </button>
+  )
+}
+
 export default function LeadDetail({ leadId, leads = [], setPage }) {
   const lead = leads.find(l => l.id === leadId)
-  const [activeTab, setActiveTab] = useState('text')
+  const [smartDraftEnabled, setSmartDraftEnabled] = useState(true)
 
   if (!lead) return (
     <div className="flex-1 flex items-center justify-center text-gray-500">
@@ -90,7 +105,7 @@ export default function LeadDetail({ leadId, leads = [], setPage }) {
     </div>
   )
 
-  const activeDraft = lead.smartDrafts.find(d => d.channel.toLowerCase() === activeTab)
+  const firstName = lead.name.split(' ')[0]
 
   return (
     <div className="flex-1 overflow-y-auto p-8">
@@ -211,41 +226,45 @@ export default function LeadDetail({ leadId, leads = [], setPage }) {
             </div>
           </div>
 
-          {/* Smart Drafts */}
+          {/* AI SmartDraft */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h3 className="text-base font-bold text-white mb-1 flex items-center gap-2">
-              <MessageSquare size={16} className="text-blue-400" />
-              Smart Draft
-            </h3>
-            <p className="text-xs text-gray-500 mb-4">AI-suggested message based on {lead.name.split(' ')[0]}'s behavior</p>
-
-            {/* Tabs */}
-            <div className="flex gap-1 bg-gray-800 rounded-xl p-1 mb-4 w-fit">
-              {lead.smartDrafts.map(draft => (
-                <button
-                  key={draft.channel}
-                  onClick={() => setActiveTab(draft.channel.toLowerCase())}
-                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                    activeTab === draft.channel.toLowerCase()
-                      ? 'bg-gray-700 text-white shadow'
-                      : 'text-gray-400 hover:text-gray-200'
-                  }`}
-                >
-                  {draft.channel}
-                </button>
-              ))}
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Sparkles size={16} className="text-blue-400" />
+                AI SmartDraft
+              </h3>
+              <Toggle enabled={smartDraftEnabled} onChange={() => setSmartDraftEnabled(e => !e)} />
             </div>
 
-            {activeDraft && (
-              <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50">
-                {activeDraft.subject && (
-                  <p className="text-xs text-gray-500 mb-1">Subject: <span className="text-gray-300 font-medium">{activeDraft.subject}</span></p>
+            {smartDraftEnabled && (
+              <>
+                <p className="text-xs text-gray-500 mt-1 mb-4">AI-generated conversation starter based on {firstName}'s behavior</p>
+                {lead.aiSuggestion ? (
+                  <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50">
+                    <p className="text-sm text-gray-200 leading-relaxed">{lead.aiSuggestion}</p>
+                    <div className="flex items-center gap-2 mt-4 flex-wrap">
+                      <CopyButton text={lead.aiSuggestion} />
+                      <a
+                        href={`sms:${lead.phone}?body=${encodeURIComponent(lead.aiSuggestion)}`}
+                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-green-500/15 border border-green-500/20 hover:bg-green-500/25 text-green-400 font-medium transition-colors"
+                      >
+                        <MessageSquare size={12} /> Text {firstName}
+                      </a>
+                      <a
+                        href={`mailto:${lead.email}?subject=${encodeURIComponent('Following up on your home search')}&body=${encodeURIComponent(lead.aiSuggestion)}`}
+                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-blue-500/15 border border-blue-500/20 hover:bg-blue-500/25 text-blue-400 font-medium transition-colors"
+                      >
+                        <Mail size={12} /> Email {firstName}
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-gray-800/40 rounded-xl p-4 border border-gray-700/30 flex items-center gap-3">
+                    <div className="w-4 h-4 border-2 border-blue-500/40 border-t-blue-400 rounded-full animate-spin flex-shrink-0" />
+                    <p className="text-sm text-gray-500">AI suggestion is being generated…</p>
+                  </div>
                 )}
-                <p className="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">{activeDraft.message}</p>
-                <div className="flex justify-end mt-3">
-                  <CopyButton text={activeDraft.message} />
-                </div>
-              </div>
+              </>
             )}
           </div>
         </div>
