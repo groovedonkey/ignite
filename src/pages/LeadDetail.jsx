@@ -2,8 +2,12 @@ import { useState } from 'react'
 import {
   ArrowLeft, Phone, Mail, Copy, Check, MapPin, Zap,
   Image, DollarSign, Heart, Search, RotateCcw, MessageSquare,
-  Clock, TrendingUp, Home, Sparkles
+  Clock, TrendingUp, Home, Sparkles, CheckCircle2, Circle,
+  PhoneCall, StickyNote, CalendarPlus, Send, Kanban,
 } from 'lucide-react'
+import { STAGES, updateStage, markContacted } from '../utils/prospectActions'
+import { createTask, completeTask, taskTiming, TASK_TYPES } from '../hooks/useTasks'
+import { useActivity, logActivity } from '../hooks/useActivity'
 
 function IntentRing({ score, size = 80 }) {
   const radius = (size - 10) / 2
@@ -43,13 +47,9 @@ function ScoreBar({ label, value, color }) {
 }
 
 const activityIcons = {
-  photos: Image,
-  financial: DollarSign,
-  save: Heart,
-  inquiry: Mail,
-  search: Search,
-  revisit: RotateCcw,
-  calculator: DollarSign,
+  photos: Image, financial: DollarSign, save: Heart, inquiry: Mail,
+  search: Search, revisit: RotateCcw, calculator: DollarSign,
+  call: PhoneCall, text: MessageSquare, email: Mail, note: StickyNote,
 }
 
 const activityColors = {
@@ -60,6 +60,10 @@ const activityColors = {
   search: 'text-cyan-400 bg-cyan-500/15',
   revisit: 'text-orange-400 bg-orange-500/15',
   calculator: 'text-emerald-400 bg-emerald-500/15',
+  call: 'text-green-400 bg-green-500/15',
+  text: 'text-blue-400 bg-blue-500/15',
+  email: 'text-purple-400 bg-purple-500/15',
+  note: 'text-gray-400 bg-gray-500/15',
 }
 
 function CopyButton({ text }) {
@@ -80,9 +84,125 @@ function CopyButton({ text }) {
   )
 }
 
-export default function LeadDetail({ leadId, leads = [], setPage }) {
+function LogActivityForm({ prospectId, onDone }) {
+  const [channel, setChannel] = useState('call')
+  const [notes, setNotes] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  async function submit(e) {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      await logActivity(prospectId, { channel, notes })
+      setNotes('')
+      onDone?.()
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-3.5 mb-4 space-y-2.5">
+      <div className="flex items-center gap-2">
+        {['call', 'text', 'email', 'note'].map(c => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => setChannel(c)}
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium capitalize transition-colors ${
+              channel === c ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+      <input
+        type="text"
+        value={notes}
+        onChange={e => setNotes(e.target.value)}
+        placeholder="What happened / what was discussed?"
+        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:border-orange-500/50"
+      />
+      <button
+        type="submit"
+        disabled={saving}
+        className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-400 disabled:bg-orange-500/40 text-white font-semibold transition-colors"
+      >
+        <Send size={11} /> {saving ? 'Logging…' : 'Log It'}
+      </button>
+    </form>
+  )
+}
+
+function NextStepForm({ prospectId, prospectName, onDone }) {
+  const [type, setType] = useState('call')
+  const [dueDate, setDueDate] = useState(() => new Date().toISOString().slice(0, 10))
+  const [dueTime, setDueTime] = useState('09:00')
+  const [notes, setNotes] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  async function submit(e) {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      await createTask({ prospectId, prospectName, type, dueAt: `${dueDate}T${dueTime}`, notes })
+      onDone?.()
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-3.5 mb-4 space-y-2.5">
+      <div className="flex items-center gap-2 flex-wrap">
+        {TASK_TYPES.map(t => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setType(t.id)}
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+              type === t.id ? 'bg-blue-500 text-white' : 'bg-gray-800 text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)}
+          className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-blue-500/50" />
+        <input type="time" value={dueTime} onChange={e => setDueTime(e.target.value)}
+          className="w-24 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-blue-500/50" />
+      </div>
+      <input
+        type="text"
+        value={notes}
+        onChange={e => setNotes(e.target.value)}
+        placeholder="Note for this follow-up (optional)"
+        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:border-blue-500/50"
+      />
+      <button
+        type="submit"
+        disabled={saving}
+        className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-400 disabled:bg-blue-500/40 text-white font-semibold transition-colors"
+      >
+        <CalendarPlus size={11} /> {saving ? 'Scheduling…' : 'Schedule'}
+      </button>
+    </form>
+  )
+}
+
+export default function LeadDetail({ leadId, leads = [], tasks = [], setPage }) {
   const lead = leads.find(l => l.id === leadId)
   const [initiated, setInitiated] = useState(false)
+  const [showLogForm, setShowLogForm] = useState(false)
+  const [showNextStepForm, setShowNextStepForm] = useState(false)
+  const { entries: loggedActivity } = useActivity(leadId)
 
   if (!lead) return (
     <div className="flex-1 flex items-center justify-center text-gray-500">
@@ -91,6 +211,24 @@ export default function LeadDetail({ leadId, leads = [], setPage }) {
   )
 
   const firstName = lead.name.split(' ')[0]
+  const stage = lead.stage || 'new'
+  const leadTasks = tasks
+    .filter(t => t.prospectId === leadId && !t.completed)
+    .map(t => ({ ...t, timing: taskTiming(t) }))
+    .sort((a, b) => (a.timing.due?.getTime() || 0) - (b.timing.due?.getTime() || 0))
+
+  // Merge real logged communications with behavioral (site-activity) events into one timeline.
+  const combinedActivity = [
+    ...loggedActivity.map(e => ({
+      id: `log_${e.id}`,
+      type: e.channel,
+      event: e.notes ? `${e.channel.charAt(0).toUpperCase()}${e.channel.slice(1)} logged — "${e.notes}"` : `${e.channel.charAt(0).toUpperCase()}${e.channel.slice(1)} logged`,
+      time: e.createdAt?.toDate ? e.createdAt.toDate().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'Just now',
+      highlight: true,
+      sortMs: e.createdAt?.toDate ? e.createdAt.toDate().getTime() : Date.now(),
+    })),
+    ...(lead.activity || []).map((a, i) => ({ ...a, sortMs: -i })), // behavioral events, oldest ordering preserved
+  ].sort((a, b) => (b.sortMs ?? 0) - (a.sortMs ?? 0))
 
   return (
     <div className="flex-1 overflow-y-auto p-8">
@@ -138,6 +276,9 @@ export default function LeadDetail({ leadId, leads = [], setPage }) {
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-400 font-medium">Source: {lead.source}</span>
+              <span className="text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-400 font-medium">
+                {lead.status === 'contacted' ? '✓ Contacted' : 'Not yet contacted'}
+              </span>
               {lead.tags.map(tag => (
                 <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 font-medium">
                   {tag}
@@ -165,7 +306,33 @@ export default function LeadDetail({ leadId, leads = [], setPage }) {
             >
               <Mail size={14} /> Send Email
             </a>
+            {lead.status !== 'contacted' && (
+              <button
+                onClick={() => markContacted(lead.id)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-xl text-sm font-semibold transition-colors border border-gray-700"
+              >
+                <CheckCircle2 size={14} /> Mark Contacted
+              </button>
+            )}
           </div>
+        </div>
+
+        {/* Stage selector */}
+        <div className="mt-4 flex items-center gap-2.5 flex-wrap">
+          <span className="text-xs text-gray-500 font-medium flex items-center gap-1.5"><Kanban size={12} /> Stage:</span>
+          {STAGES.map(s => (
+            <button
+              key={s.id}
+              onClick={() => updateStage(lead.id, s.id)}
+              className={`text-xs px-2.5 py-1 rounded-full font-medium border transition-colors ${
+                stage === s.id
+                  ? 'bg-orange-500 border-orange-500 text-white'
+                  : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-gray-200 hover:border-gray-600'
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
         </div>
 
         {/* Summary */}
@@ -185,12 +352,27 @@ export default function LeadDetail({ leadId, leads = [], setPage }) {
         <div className="col-span-2 space-y-6">
           {/* Activity Timeline */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h3 className="text-base font-bold text-white mb-4 flex items-center gap-2">
-              <Zap size={16} className="text-orange-400" />
-              Behavioral Activity
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Zap size={16} className="text-orange-400" />
+                Activity & Communications
+              </h3>
+              {!showLogForm && (
+                <button
+                  onClick={() => setShowLogForm(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold transition-colors border border-gray-700"
+                >
+                  <PhoneCall size={12} /> Log Activity
+                </button>
+              )}
+            </div>
+
+            {showLogForm && (
+              <LogActivityForm prospectId={leadId} onDone={() => setShowLogForm(false)} />
+            )}
+
             <div className="space-y-3">
-              {lead.activity.map((item, i) => {
+              {combinedActivity.map((item) => {
                 const Icon = activityIcons[item.type] || Zap
                 const colors = activityColors[item.type] || 'text-gray-400 bg-gray-700'
                 return (
@@ -209,6 +391,51 @@ export default function LeadDetail({ leadId, leads = [], setPage }) {
                 )
               })}
             </div>
+          </div>
+
+          {/* Next Step / Tasks */}
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <CalendarPlus size={16} className="text-blue-400" />
+                Next Step
+              </h3>
+              {!showNextStepForm && (
+                <button
+                  onClick={() => setShowNextStepForm(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-white text-xs font-semibold transition-colors"
+                >
+                  <CalendarPlus size={12} /> Schedule
+                </button>
+              )}
+            </div>
+
+            {showNextStepForm && (
+              <NextStepForm prospectId={leadId} prospectName={lead.name} onDone={() => setShowNextStepForm(false)} />
+            )}
+
+            {leadTasks.length === 0 ? (
+              <p className="text-sm text-gray-500">No follow-up scheduled for {firstName} yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {leadTasks.map(task => (
+                  <div key={task.id} className={`flex items-center gap-3 p-2.5 rounded-xl border ${
+                    task.timing.bucket === 'overdue' ? 'border-red-500/20 bg-red-500/5' : 'border-gray-800 bg-gray-800/40'
+                  }`}>
+                    <button onClick={() => completeTask(task.id)} className="text-gray-500 hover:text-green-400 transition-colors">
+                      <Circle size={16} />
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm text-gray-200 font-medium capitalize">{task.type}</span>
+                      {task.notes && <span className="text-sm text-gray-500"> — {task.notes}</span>}
+                    </div>
+                    <span className={`text-xs font-medium flex-shrink-0 ${task.timing.bucket === 'overdue' ? 'text-red-400' : 'text-gray-500'}`}>
+                      {task.timing.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* AI SmartDraft */}

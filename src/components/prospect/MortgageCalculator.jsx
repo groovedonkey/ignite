@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { Calculator, DollarSign, TrendingUp } from 'lucide-react'
+import { Calculator, DollarSign, TrendingUp, Radio } from 'lucide-react'
 import { useSession } from '../../context/SessionContext'
+import { useMortgageRate } from '../../hooks/useMortgageRate'
 
 function formatCurrency(n) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
@@ -32,14 +33,22 @@ function Slider({ label, value, min, max, step, format, onChange }) {
 
 export default function MortgageCalculator({ onContactClick }) {
   const { logCalculatorUse } = useSession()
+  const { rate: liveRate, date: liveRateDate, live: rateIsLive } = useMortgageRate()
 
   const [homePrice, setHomePrice] = useState(450000)
   const [downPaymentPct, setDownPaymentPct] = useState(20)
   const [interestRate, setInterestRate] = useState(6.8)
+  const [rateTouched, setRateTouched] = useState(false)
   const [termYears, setTermYears] = useState(30)
   const loggedRef = useRef(false)
   const logFnRef = useRef(logCalculatorUse)
   logFnRef.current = logCalculatorUse
+
+  // Seed the slider with the live Freddie Mac rate once it loads — but only
+  // if the visitor hasn't already dragged the slider themselves.
+  useEffect(() => {
+    if (!rateTouched && liveRate) setInterestRate(liveRate)
+  }, [liveRate]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function markUsed() {
     if (!loggedRef.current) {
@@ -104,15 +113,24 @@ export default function MortgageCalculator({ onContactClick }) {
               format={v => `${v}%`}
               onChange={v => { setDownPaymentPct(v); markUsed() }}
             />
-            <Slider
-              label="Interest Rate"
-              value={interestRate}
-              min={3}
-              max={12}
-              step={0.1}
-              format={v => `${v.toFixed(1)}%`}
-              onChange={v => { setInterestRate(v); markUsed() }}
-            />
+            <div>
+              <Slider
+                label="Interest Rate"
+                value={interestRate}
+                min={3}
+                max={12}
+                step={0.1}
+                format={v => `${v.toFixed(1)}%`}
+                onChange={v => { setInterestRate(v); setRateTouched(true); markUsed() }}
+              />
+              {rateIsLive && (
+                <p className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium mt-2">
+                  <Radio className="w-3 h-3" />
+                  {rateTouched ? 'Started from' : 'Live'} today's average 30-yr rate
+                  {liveRateDate ? ` (${new Date(liveRateDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})` : ''} — Freddie Mac PMMS via FRED
+                </p>
+              )}
+            </div>
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-3">Loan Term</label>
               <div className="flex gap-3">

@@ -1,9 +1,36 @@
-import { useState } from 'react'
-import { Bed, Bath, Square, MapPin, ChevronDown, ChevronUp, Check } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Bed, Bath, Square, MapPin, ChevronDown, ChevronUp, Check, Waves } from 'lucide-react'
 import { useSession } from '../../context/SessionContext'
+import { getFloodZone } from '../../utils/floodZone'
 
 function formatPrice(p) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(p)
+}
+
+function FloodBadge({ lat, lng }) {
+  const [zone, setZone] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    if (lat && lng) {
+      getFloodZone(lat, lng).then(result => { if (!cancelled) setZone(result) })
+    }
+    return () => { cancelled = true }
+  }, [lat, lng])
+
+  if (!zone) return null
+
+  const colors = zone.risk === 'high'
+    ? 'bg-red-50 text-red-600 border-red-200'
+    : zone.risk === 'low'
+      ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+      : 'bg-gray-50 text-gray-500 border-gray-200'
+
+  return (
+    <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full border ${colors}`} title="FEMA National Flood Hazard Layer">
+      <Waves className="w-3 h-3" /> {zone.label}
+    </span>
+  )
 }
 
 export default function ListingCard({ listing }) {
@@ -78,7 +105,7 @@ export default function ListingCard({ listing }) {
         {expanded && (
           <div className="mt-4 pt-4 border-t border-gray-100">
             <p className="text-gray-600 text-sm leading-relaxed mb-4">{listing.description}</p>
-            <ul className="grid grid-cols-2 gap-2">
+            <ul className="grid grid-cols-2 gap-2 mb-4">
               {listing.highlights.map((h) => (
                 <li key={h} className="flex items-start gap-2 text-sm text-gray-700">
                   <Check className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
@@ -86,6 +113,7 @@ export default function ListingCard({ listing }) {
                 </li>
               ))}
             </ul>
+            <FloodBadge lat={listing.lat} lng={listing.lng} />
           </div>
         )}
       </div>

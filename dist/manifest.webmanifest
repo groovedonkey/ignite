@@ -1,0 +1,13 @@
+{
+  "name": "Ignite — Lead Intent Engine",
+  "short_name": "Ignite",
+  "description": "AI-powered real estate CRM and prospect site.",
+  "start_url": "/portal",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#f97316",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

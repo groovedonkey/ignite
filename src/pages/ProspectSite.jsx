@@ -5,6 +5,7 @@ import Listings from '../components/prospect/Listings'
 import MortgageCalculator from '../components/prospect/MortgageCalculator'
 import ContactForm from '../components/prospect/ContactForm'
 import Footer from '../components/prospect/Footer'
+import ChatWidget from '../components/prospect/ChatWidget'
 import { Shield, Award, Clock, Users, Home, TrendingUp, MapPin, Waves } from 'lucide-react'
 import { REALTOR } from '../config'
 
@@ -112,6 +113,7 @@ export default function ProspectSite() {
       </section>
 
       <Footer />
+      <ChatWidget />
 
       {/* Contact modal */}
       {showModal && (

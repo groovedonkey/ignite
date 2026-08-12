@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Search, Phone, Mail, ArrowUpDown } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Search, Phone, Mail, ArrowUpDown, Upload, X, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { parseCsv, bulkImportProspects } from '../utils/importLeads'
 
 function IntentRing({ score, size = 52 }) {
   const radius = (size - 8) / 2
@@ -39,6 +40,7 @@ function SourceBadge({ source }) {
     Facebook: 'bg-indigo-500/10 text-indigo-400',
     Instagram: 'bg-pink-500/10 text-pink-400',
     Referral: 'bg-green-500/10 text-green-400',
+    'CSV Import': 'bg-teal-500/10 text-teal-400',
   }
   return (
     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${map[source] || 'bg-gray-700 text-gray-400'}`}>
@@ -53,6 +55,27 @@ export default function Leads({ leads = [], loading = false, setPage, setSelecte
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('All')
   const [sortDir, setSortDir] = useState('desc')
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState(null)
+  const fileInputRef = useRef(null)
+
+  async function handleFileSelect(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImporting(true)
+    setImportResult(null)
+    try {
+      const text = await file.text()
+      const rows = parseCsv(text)
+      const result = await bulkImportProspects(rows)
+      setImportResult(result)
+    } catch (err) {
+      setImportResult({ imported: 0, skipped: 0, errors: [err.message] })
+    } finally {
+      setImporting(false)
+      e.target.value = ''
+    }
+  }
 
   const filtered = leads
     .filter(l => {
@@ -68,12 +91,49 @@ export default function Leads({ leads = [], loading = false, setPage, setSelecte
   return (
     <div className="flex-1 overflow-y-auto p-8">
       {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white">All Leads</h2>
-        <p className="text-sm text-gray-400 mt-1">
-          {filtered.length} lead{filtered.length !== 1 ? 's' : ''} · sorted by intent score
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="text-2xl font-bold text-white">All Leads</h2>
+          <p className="text-sm text-gray-400 mt-1">
+            {filtered.length} lead{filtered.length !== 1 ? 's' : ''} · sorted by intent score
+          </p>
+        </div>
+        <div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,text/csv"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 border border-gray-800 hover:border-gray-700 rounded-xl text-sm font-medium text-gray-300 transition-colors disabled:opacity-50"
+          >
+            <Upload size={14} /> {importing ? 'Importing…' : 'Import CSV'}
+          </button>
+        </div>
       </div>
+
+      {importResult && (
+        <div className={`mb-6 flex items-start justify-between gap-3 rounded-xl p-3.5 border ${
+          importResult.errors.length ? 'bg-amber-500/10 border-amber-500/20' : 'bg-green-500/10 border-green-500/20'
+        }`}>
+          <div className="flex items-start gap-2.5">
+            {importResult.errors.length ? <AlertTriangle size={16} className="text-amber-400 mt-0.5" /> : <CheckCircle2 size={16} className="text-green-400 mt-0.5" />}
+            <p className="text-sm text-gray-200">
+              Imported <strong>{importResult.imported}</strong> lead{importResult.imported !== 1 ? 's' : ''}.
+              {importResult.skipped > 0 && ` Skipped ${importResult.skipped} row${importResult.skipped !== 1 ? 's' : ''} missing a name or email.`}
+              {importResult.errors.length > 0 && ` ${importResult.errors.length} error(s) occurred.`}
+              {' '}Expected columns: <code className="text-xs bg-gray-800 px-1.5 py-0.5 rounded">firstName, lastName, email, phone, intent, budget, message</code> (or a single <code className="text-xs bg-gray-800 px-1.5 py-0.5 rounded">name</code> column).
+            </p>
+          </div>
+          <button onClick={() => setImportResult(null)} className="text-gray-500 hover:text-white transition-colors flex-shrink-0">
+            <X size={14} />
+          </button>
+        </div>
+      )}
 
       {/* Controls */}
       <div className="flex items-center gap-3 mb-6">

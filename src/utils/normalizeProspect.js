@@ -32,6 +32,7 @@ export function normalizeProspect(docSnapshot) {
           ? [{ channel: 'Text', message: raw.aiSuggestion }]
           : [],
       lastActiveMs: raw.lastActiveMs ?? msAgo(raw.createdAt),
+      stage: raw.stage || 'new',
     }
   }
 
@@ -110,7 +111,7 @@ export function normalizeProspect(docSnapshot) {
     initials,
     email: raw.email || '',
     phone: raw.phone || '',
-    source: 'Website',
+    source: raw.source || 'Website',
     temperature,
     intentScore: score,
     lastActive: timeAgo(raw.createdAt),
@@ -134,5 +135,6 @@ export function normalizeProspect(docSnapshot) {
     timeOnSite: raw.timeOnSite || 0,
     aiSuggestion: raw.aiSuggestion || null,
     isMockLead: false,
+    stage: raw.stage || 'new',
   }
 }

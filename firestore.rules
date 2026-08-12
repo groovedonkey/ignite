@@ -1,18 +1,41 @@
 rules_version = '2';
 
+function isRealtor() {
+  return request.auth != null
+    && request.auth.token.email == 'dro@groovedonkey.com';
+  // TODO(multi-tenant): once accounts exist, replace with
+  // `resource.data.realtorId == request.auth.uid` (per-doc ownership).
+}
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
     // Prospects: anyone can create (public contact form),
-    // only authenticated realtor can read/update
+    // only the authenticated realtor can read/update.
     match /prospects/{prospectId} {
-      allow read, create, update: if true;
+      allow create: if true;
+      allow read, update: if isRealtor();
       allow delete: if false;
+
+      // Logged communications (calls/texts/emails/notes) for this lead.
+      // Nested under the prospect so it inherits the same access boundary.
+      match /activity/{entryId} {
+        allow read, create, update: if isRealtor();
+        allow delete: if false;
+      }
     }
 
-    // Sessions: public read/write for anonymous activity tracking
+    // Tasks / follow-up reminders. Top-level (not nested) so the CRM can
+    // query "everything due today" across all leads in one listener.
+    match /tasks/{taskId} {
+      allow read, create, update: if isRealtor();
+      allow delete: if isRealtor();
+    }
+
+    // Sessions: unused by the app today (session data is embedded directly
+    // into the prospect doc on submit) — locked down rather than left open.
     match /sessions/{sessionId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

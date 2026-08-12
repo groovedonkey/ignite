@@ -1,17 +1,23 @@
 import { useState } from 'react'
 import { Menu, Flame } from 'lucide-react'
 import { useProspects } from '../hooks/useProspects'
+import { useTasks, taskTiming } from '../hooks/useTasks'
 import Sidebar from '../components/Sidebar'
 import Dashboard from './Dashboard'
 import Leads from './Leads'
 import LeadDetail from './LeadDetail'
 import Alerts from './Alerts'
+import Pipeline from './Pipeline'
+import Calendar from './Calendar'
+import Tasks from './Tasks'
+import Analytics from './Analytics'
 
 export default function CRMPortal() {
   const [page, setPage] = useState('dashboard')
   const [selectedLeadId, setSelectedLeadId] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { leads, loading: leadsLoading } = useProspects()
+  const { tasks, loading: tasksLoading } = useTasks()
 
   const handleSetPage = (p) => {
     setPage(p)
@@ -20,14 +26,23 @@ export default function CRMPortal() {
   }
 
   const alertCount = leads.filter(l => l.isAlerted).length
+  const taskCount = tasks.filter(t => {
+    if (t.completed) return false
+    const { bucket } = taskTiming(t)
+    return bucket === 'overdue' || bucket === 'today'
+  }).length
 
   const renderPage = () => {
-    const sharedProps = { leads, loading: leadsLoading, setPage: handleSetPage, setSelectedLeadId }
+    const sharedProps = { leads, loading: leadsLoading, tasks, tasksLoading, setPage: handleSetPage, setSelectedLeadId }
     switch (page) {
       case 'dashboard':   return <Dashboard {...sharedProps} />
       case 'leads':       return <Leads {...sharedProps} />
-      case 'lead-detail': return <LeadDetail leadId={selectedLeadId} leads={leads} setPage={handleSetPage} />
+      case 'lead-detail': return <LeadDetail leadId={selectedLeadId} leads={leads} tasks={tasks} setPage={handleSetPage} />
+      case 'pipeline':    return <Pipeline {...sharedProps} />
+      case 'calendar':    return <Calendar {...sharedProps} />
+      case 'tasks':       return <Tasks {...sharedProps} />
       case 'alerts':      return <Alerts {...sharedProps} />
+      case 'analytics':   return <Analytics {...sharedProps} />
       default:            return <Dashboard {...sharedProps} />
     }
   }
@@ -46,6 +61,7 @@ export default function CRMPortal() {
         page={page}
         setPage={handleSetPage}
         alertCount={alertCount}
+        taskCount={taskCount}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />

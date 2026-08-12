@@ -1,5 +1,8 @@
-import { Flame, Users, TrendingUp, Bell, ArrowRight, Phone, Mail } from 'lucide-react'
+import { Flame, Users, TrendingUp, Bell, ArrowRight, Phone, Mail, ListChecks, Circle } from 'lucide-react'
 import { REALTOR } from '../config'
+import { completeTask, taskTiming } from '../hooks/useTasks'
+
+const TASK_TYPE_LABEL = { call: 'Call', text: 'Text', email: 'Email', appointment: 'Appointment', note: 'Note' }
 
 function IntentRing({ score, size = 64 }) {
   const radius = (size - 8) / 2
@@ -55,9 +58,14 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
   )
 }
 
-export default function Dashboard({ leads = [], loading = false, setPage, setSelectedLeadId }) {
+export default function Dashboard({ leads = [], loading = false, tasks = [], setPage, setSelectedLeadId }) {
   const priorityContacts = [...leads].sort((a, b) => b.intentScore - a.intentScore).slice(0, 5)
   const alerts = leads.filter(l => l.isAlerted)
+  const dueTasks = tasks
+    .filter(t => !t.completed)
+    .map(t => ({ ...t, timing: taskTiming(t) }))
+    .filter(t => t.timing.bucket === 'overdue' || t.timing.bucket === 'today')
+    .sort((a, b) => (a.timing.due?.getTime() || 0) - (b.timing.due?.getTime() || 0))
   const stats = {
     totalLeads: leads.length,
     hotLeads: leads.filter(l => l.temperature === 'hot').length,
@@ -205,6 +213,57 @@ export default function Dashboard({ leads = [], loading = false, setPage, setSel
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Today's Tasks */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <ListChecks size={17} className="text-blue-400" />
+                Today's Tasks
+              </h3>
+              <button
+                onClick={() => setPage('tasks')}
+                className="text-sm text-orange-400 hover:text-orange-300 flex items-center gap-1 font-medium transition-colors"
+              >
+                All <ArrowRight size={14} />
+              </button>
+            </div>
+            {dueTasks.length === 0 ? (
+              <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+                <p className="text-xs text-gray-500">Nothing due today. Nice.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {dueTasks.slice(0, 5).map(task => (
+                  <div
+                    key={task.id}
+                    className={`bg-gray-900 border rounded-xl p-3 flex items-start gap-2.5 ${
+                      task.timing.bucket === 'overdue' ? 'border-red-500/20' : 'border-gray-800'
+                    }`}
+                  >
+                    <button
+                      onClick={() => completeTask(task.id)}
+                      className="mt-0.5 text-gray-500 hover:text-green-400 transition-colors flex-shrink-0"
+                    >
+                      <Circle size={15} />
+                    </button>
+                    <button
+                      onClick={() => { setSelectedLeadId(task.prospectId); setPage('lead-detail') }}
+                      className="flex-1 min-w-0 text-left"
+                    >
+                      <p className="text-xs font-semibold text-gray-200 truncate">{task.prospectName}</p>
+                      <p className="text-xs text-gray-500">
+                        {TASK_TYPE_LABEL[task.type] || task.type}
+                        {task.timing.bucket === 'overdue' && (
+                          <span className="text-red-400 font-medium"> · overdue</span>
+                        )}
+                      </p>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Score Legend */}

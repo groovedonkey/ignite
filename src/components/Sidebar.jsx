@@ -1,13 +1,19 @@
-import { Flame, LayoutDashboard, Users, Bell, ChevronRight, X } from 'lucide-react'
+import { Flame, LayoutDashboard, Users, Bell, ChevronRight, X, Kanban, ListChecks, BarChart3, CalendarDays, LogOut } from 'lucide-react'
+import { signOut } from 'firebase/auth'
+import { auth } from '../firebase'
 import { REALTOR } from '../config'
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'leads', label: 'All Leads', icon: Users },
-  { id: 'alerts', label: 'Alerts', icon: Bell },
+  { id: 'pipeline', label: 'Pipeline', icon: Kanban },
+  { id: 'calendar', label: 'Calendar', icon: CalendarDays },
+  { id: 'tasks', label: 'Tasks', icon: ListChecks, badgeKey: 'tasks' },
+  { id: 'alerts', label: 'Alerts', icon: Bell, badgeKey: 'alerts' },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
 ]
 
-export default function Sidebar({ page, setPage, alertCount = 0, isOpen = false, onClose }) {
+export default function Sidebar({ page, setPage, alertCount = 0, taskCount = 0, isOpen = false, onClose }) {
   return (
     <aside className={`
       fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 border-r border-gray-800 flex flex-col flex-shrink-0
@@ -36,8 +42,8 @@ export default function Sidebar({ page, setPage, alertCount = 0, isOpen = false,
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {NAV.map(({ id, label, icon: Icon }) => {
-          const badge = id === 'alerts' ? alertCount : 0
+        {NAV.map(({ id, label, icon: Icon, badgeKey }) => {
+          const badge = badgeKey === 'alerts' ? alertCount : badgeKey === 'tasks' ? taskCount : 0
           const active = page === id
           return (
             <button
@@ -74,6 +80,13 @@ export default function Sidebar({ page, setPage, alertCount = 0, isOpen = false,
             <p className="text-sm font-medium text-gray-200 truncate">{REALTOR.name}</p>
             <p className="text-xs text-gray-500 truncate">Lead Agent</p>
           </div>
+          <button
+            onClick={() => signOut(auth)}
+            title="Sign out"
+            className="text-gray-500 hover:text-red-400 transition-colors p-1.5 flex-shrink-0"
+          >
+            <LogOut size={15} />
+          </button>
         </div>
       </div>
     </aside>

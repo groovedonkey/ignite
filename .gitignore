@@ -1,1 +1,9 @@
 node_modules
+
+# Local env overrides and Cloud Functions secrets — never commit real values
+.env
+.env.local
+.env.*.local
+functions/.env
+functions/.env.*
+!functions/.env.example
