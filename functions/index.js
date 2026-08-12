@@ -163,14 +163,11 @@ exports.chatWithAgent = onCall(
 
 // ── Live MLS feed (prospect site listings) ──────────────────────────────────
 // Proxies the SimplyRETS RESO API server-side so credentials never reach the
-// browser. Ships working out of the box against SimplyRETS' public demo
-// account (simplyrets/simplyrets — their own documented test credentials,
-// returns realistic sample inventory); once a real MLS/IDX SimplyRETS
-// subscription exists, set SIMPLYRETS_USER / SIMPLYRETS_PASS as function
-// config (functions.config or a .env file next to index.js — no redeploy of
-// this code required) and real listings take over automatically.
-const SIMPLYRETS_DEMO_USER = 'simplyrets'
-const SIMPLYRETS_DEMO_PASS = 'simplyrets'
+// browser. Until a real MLS/IDX SimplyRETS subscription is configured (set
+// SIMPLYRETS_USER / SIMPLYRETS_PASS via functions/.env.<project-id> — see
+// .env.example), this reports "not configured" and the frontend falls back
+// to the curated local listings rather than showing SimplyRETS' demo-account
+// data (unrelated Houston, TX trial inventory) under a "live" badge.
 const PLACEHOLDER_PHOTO = 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop&q=80'
 
 let mlsCache = { data: null, ts: 0, live: false }
@@ -216,14 +213,24 @@ function transformSimplyRetsListing(raw) {
 }
 
 exports.getMlsListings = onCall({ cors: true }, async () => {
-  const now = Date.now()
-  if (mlsCache.data && now - mlsCache.ts < MLS_TTL_MS) {
-    return { listings: mlsCache.data, live: mlsCache.live, source: 'cache' }
+  const user = (process.env.SIMPLYRETS_USER || '').trim()
+  const pass = (process.env.SIMPLYRETS_PASS || '').trim()
+
+  // No real MLS/IDX account configured yet — SimplyRETS' public demo
+  // account returns real API responses, but the *data* is canned Houston,
+  // TX trial inventory with lorem-ipsum remarks. Serving that on a
+  // Brunswick, GA site under a "Live MLS Data" badge would look broken,
+  // not impressive. Until real credentials are set (see .env.example),
+  // report "not configured" so the frontend falls back to the curated
+  // local Brunswick listings instead.
+  if (!user || !pass) {
+    return { listings: [], live: false, source: 'not-configured' }
   }
 
-  const user = (process.env.SIMPLYRETS_USER || SIMPLYRETS_DEMO_USER).trim()
-  const pass = (process.env.SIMPLYRETS_PASS || SIMPLYRETS_DEMO_PASS).trim()
-  const usingRealAccount = user !== SIMPLYRETS_DEMO_USER
+  const now = Date.now()
+  if (mlsCache.data && now - mlsCache.ts < MLS_TTL_MS) {
+    return { listings: mlsCache.data, live: true, source: 'cache' }
+  }
 
   try {
     const auth = Buffer.from(`${user}:${pass}`).toString('base64')
@@ -235,11 +242,11 @@ exports.getMlsListings = onCall({ cors: true }, async () => {
     const listings = Array.isArray(raw) ? raw.map(transformSimplyRetsListing) : []
 
     mlsCache = { data: listings, ts: now, live: true }
-    return { listings, live: true, source: usingRealAccount ? 'simplyrets' : 'simplyrets-demo' }
+    return { listings, live: true, source: 'simplyrets' }
   } catch (err) {
     console.error('getMlsListings error:', err)
     // Serve the last good cache rather than nothing, if we have one.
-    if (mlsCache.data) return { listings: mlsCache.data, live: mlsCache.live, source: 'stale-cache' }
+    if (mlsCache.data) return { listings: mlsCache.data, live: true, source: 'stale-cache' }
     return { listings: [], live: false, source: 'error' }
   }
 })
