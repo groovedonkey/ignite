@@ -5,5 +5,8 @@ export const REALTOR = {
   company: 'Groove Donkey Realtyworks',
   location: 'Brunswick, GA',
   tagline: 'Your Golden Isles real estate expert',
-  allowedEmail: 'dro@groovedonkey.com',
+  // The only account allowed into /portal — must match the email checked in
+  // firestore.rules' isRealtor(), or reads/writes will be denied even after
+  // a successful Google sign-in.
+  allowedEmail: 'littlepete1976@gmail.com',
 }

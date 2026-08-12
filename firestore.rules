@@ -2,7 +2,8 @@ rules_version = '2';
 
 function isRealtor() {
   return request.auth != null
-    && request.auth.token.email == 'dro@groovedonkey.com';
+    && request.auth.token.email == 'littlepete1976@gmail.com';
+  // Must match REALTOR.allowedEmail in src/config.js.
   // TODO(multi-tenant): once accounts exist, replace with
   // `resource.data.realtorId == request.auth.uid` (per-doc ownership).
 }
